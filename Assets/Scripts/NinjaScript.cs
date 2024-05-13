@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,11 +10,14 @@ public class NinjaScript : MonoBehaviour
     public float vitesseXMax;   //vitesse horizontale Maximale désirée
     float vitesseY;      //vitesse verticale 
     public float vitesseSaut;   //vitesse de saut désirée
-    bool partieTerminee;
+    public bool partieTerminee;
     public bool attaque;
 
     public GameObject FinScene1;
     public GameObject DebutScene2;
+
+    public GameObject ImgBulle1;
+    public GameObject ImgBulle2;
 
     void Update()
     {
@@ -36,7 +40,7 @@ public class NinjaScript : MonoBehaviour
             }
 
             // sauter l'objet à l'aide la touche "w"
-           
+
             if (Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.UpArrow) && Physics2D.OverlapCircle(transform.position, 1f))
             {
                 vitesseY = vitesseSaut;
@@ -100,38 +104,53 @@ public class NinjaScript : MonoBehaviour
         //    Invoke("recommencer", 3f);
         //}
         else if (infoCollision.gameObject.name == "EnnemiNinja")
-        { 
-            if (attaque)
-            {
-                Destroy(infoCollision.gameObject);
-            }
-            else
+        {
+            if (!attaque)
             {
                 GetComponent<Animator>().SetTrigger("mort");
                 Invoke("recommencer", 3f);
             }
         }
-        else if (infoCollision.gameObject.name == "Sensai")
-        {
 
-        }
     }
 
-    private void OnTriggerEnter2D(Collider2D infosCollisionTrigger)
+    void OnTriggerEnter2D(Collider2D infoCollision)
     {
-        if (FinScene1 != null && DebutScene2 != null && infosCollisionTrigger.gameObject.name == "FinScene1")
+        if (infoCollision.gameObject.CompareTag("Sensai"))
+        {
+            partieTerminee = true;
+            GetComponent<Animator>().SetBool("course", false);
+            Invoke("ArretPersonnage", 3f);
+            Invoke("ChangeImg", 1.5f);
+            infoCollision.gameObject.GetComponent<CapsuleCollider2D>().enabled = false;
+
+            //GetComponent<AudioSource>().PlayOneShot();
+        }
+
+        if (FinScene1 != null && DebutScene2 != null && infoCollision.gameObject.name == "FinScene1")
         {
             gameObject.transform.position = DebutScene2.transform.position;
         }
+
     }
+
 
     void recommencer()
     {
         SceneManager.LoadScene(0);
     }
-
     void AnnulerAttaque()
     {
         attaque = false;
+    }
+    void ArretPersonnage()
+    {
+        partieTerminee = false;
+
+    }
+    void ChangeImg()
+    {
+        ImgBulle2.SetActive(true);
+        ImgBulle1.SetActive(false);
     }
 }

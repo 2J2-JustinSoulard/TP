@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ennemi1
+  - Ninja
+  - Sensai
   layers:
   - Default
   - TransparentFX
